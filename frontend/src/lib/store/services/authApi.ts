@@ -17,11 +17,15 @@ export interface LoginResponse {
   user: AuthUser;
   locations: LocationItem[];
   needsLocationSelection: boolean;
+  tenant?: { id: string; name: string; slug: string } | null;
+  role?: string;
 }
 
 export interface MeResponse {
   user: AuthUser;
   tenantId: string;
+  tenantSlug?: string | null;
+  tenantName?: string | null;
   role: string;
   locationId: string | null;
 }
@@ -43,6 +47,8 @@ export const authApi = createApi({
           dispatch(
             setCredentials({
               user: data.user,
+              tenantId: data.tenant?.id,
+              role: data.role,
               locations: data.locations,
               needsLocationSelection: data.needsLocationSelection,
             })

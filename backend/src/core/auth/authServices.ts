@@ -6,7 +6,7 @@ import {
   hashToken,
   signAccessToken,
 } from "./token.service";
-import { locations, refreshTokens, tenantMembers, users } from "@/db/schema";
+import { locations, refreshTokens, tenantMembers, tenants, users } from "@/db/schema";
 import { LoginInput } from "@/lib/validation/src/auth";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -66,6 +66,10 @@ export async function login(input: LoginInput) {
       throw new AuthError("No business found for this account");
     }
 
+    const tenant = await db.query.tenants.findFirst({
+      where: eq(tenants.id, membership.tenantId),
+    });
+
     const tenantLocations = await db.query.locations.findMany({
       where: eq(locations.tenantId, membership.tenantId),
     });
@@ -86,6 +90,8 @@ export async function login(input: LoginInput) {
       refreshToken,
       locations: tenantLocations,
       needsLocationSelection: tenantLocations.length > 1,
+      tenant,
+      role: membership.role.toLowerCase(),
     };
   } catch (error) {
     if (error instanceof AuthError) {

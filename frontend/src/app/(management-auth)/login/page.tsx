@@ -29,7 +29,8 @@ export default function LoginPage() {
       if (result.needsLocationSelection) {
         router.push("/select-location");
       } else {
-        router.push("/");
+        const tenantSlug = result.tenant?.slug || "test-org";
+        router.push(`/t/${tenantSlug}/dashboard`);
       }
     } catch (err: unknown) {
       const apiError = err as {

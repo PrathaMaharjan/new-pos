@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema/users";
+import { tenants } from "@/db/schema/tenants";
 import { requireSession } from "@/middleware/auth.middleware";
 import { handleApiError } from "@/lib/api-error";
 
@@ -16,10 +17,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const tenant = await db.query.tenants.findFirst({
+      where: eq(tenants.id, session.tenantId),
+    });
+
     return NextResponse.json({
       user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName },
       tenantId: session.tenantId,
-      role: session.role,
+      tenantSlug: tenant?.slug ?? null,
+      tenantName: tenant?.name ?? null,
+      role: session.role.toLowerCase(),
       locationId: session.locationId,
     });
   } catch (error) {
