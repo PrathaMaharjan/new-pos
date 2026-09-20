@@ -8,6 +8,7 @@ export type IconKey =
   | 'billing'
   | 'customers'
   | 'staff'
+  | 'outlets'
   | 'settings';
 
 export type NavItem = {
@@ -70,6 +71,13 @@ export function getNavForRole(role: Role, tenantSlug: string): NavItem[] {
       href: `${base}/staff`,
       match: `${base}/staff`,
       icon: 'staff',
+      roles: ['owner', 'manager'],
+    },
+    {
+      label: 'Outlets',
+      href: `${base}/outlets`,
+      match: `${base}/outlets`,
+      icon: 'outlets',
       roles: ['owner', 'manager'],
     },
     {

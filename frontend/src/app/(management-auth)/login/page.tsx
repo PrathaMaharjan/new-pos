@@ -1,12 +1,14 @@
 "use client";
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { useLoginMutation } from "@/lib/store/services/authApi";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [login, { isLoading }] = useLoginMutation();
@@ -26,12 +28,8 @@ export default function LoginPage() {
         password,
       }).unwrap();
 
-      if (result.needsLocationSelection) {
-        router.push("/select-location");
-      } else {
-        const tenantSlug = result.tenant?.slug || "test-org";
-        router.push(`/t/${tenantSlug}/dashboard`);
-      }
+      const tenantSlug = result.tenant?.slug || "test-org";
+      router.push(`/t/${tenantSlug}/dashboard`);
     } catch (err: unknown) {
       const apiError = err as {
         data?: { error?: string; issues?: Array<{ message: string }> };
@@ -89,17 +87,28 @@ export default function LoginPage() {
             <label htmlFor="password" className="mb-1.5 block text-xs text-[#8a83ab]">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              disabled={isLoading}
-              value={password}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full rounded-lg border border-[#e8e5f5] bg-[#faf9fd] px-4 py-3 text-sm text-[#3d3560] placeholder:text-[#a39dc4] focus:border-[#6b5dd3] focus:outline-none focus:ring-2 focus:ring-[#6b5dd3]/40 disabled:opacity-50"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                disabled={isLoading}
+                value={password}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full rounded-lg border border-[#e8e5f5] bg-[#faf9fd] px-4 py-3 pr-11 text-sm text-[#3d3560] placeholder:text-[#a39dc4] focus:border-[#6b5dd3] focus:outline-none focus:ring-2 focus:ring-[#6b5dd3]/40 disabled:opacity-50 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden [&::-webkit-credentials-auto-fill-button]:hidden [&::-webkit-strong-password-auto-fill-button]:hidden"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8a83ab] hover:text-[#6b5dd3] transition-colors cursor-pointer"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <button

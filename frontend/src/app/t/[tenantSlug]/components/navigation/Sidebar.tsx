@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     ChevronLeft, ChevronRight, LogOut, Menu, X,
-    LayoutDashboard, Tags, Boxes, CalendarDays, Receipt, Users, UserCog, Settings,
+    LayoutDashboard, Tags, Boxes, CalendarDays, Receipt, Users, UserCog, Settings, Store,
     type LucideIcon,
 } from 'lucide-react';
 import { logout } from '@/lib/actions/logout';
@@ -20,6 +20,7 @@ const iconMap: Record<IconKey, LucideIcon> = {
     billing: Receipt,
     customers: Users,
     staff: UserCog,
+    outlets: Store,
     settings: Settings,
 };
 

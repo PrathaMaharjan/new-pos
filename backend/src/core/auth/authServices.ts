@@ -71,7 +71,10 @@ export async function login(input: LoginInput) {
     });
 
     const tenantLocations = await db.query.locations.findMany({
-      where: eq(locations.tenantId, membership.tenantId),
+      where: and(
+        eq(locations.tenantId, membership.tenantId),
+        eq(locations.isActive, true)
+      ),
     });
 
     const autoLocationId =
