@@ -4,15 +4,17 @@ import {
   text,
   timestamp,
   uuid,
+  decimal,
   boolean,
   integer,
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
 
-
 import { tenants } from "./tenants";
 import { customers } from "./customers";
+import { locations } from "./location";
+
 
 export const resourceTypes = pgTable(
   "resource_types",
@@ -64,6 +66,11 @@ export const resources = pgTable(
       .references(() => tenants.id, {
         onDelete: "cascade",
       }),
+    locationId: uuid("location_id")
+      .notNull()
+      .references(() => locations.id, {
+        onDelete: "restrict",
+      }),
 
     resourceTypeId: uuid("resource_type_id")
       .notNull()
@@ -76,6 +83,13 @@ export const resources = pgTable(
     description: text("description"),
 
     capacity: integer("capacity"),
+
+    // The base price of the resource, with a precision of 12 and scale of 2 (e.g., 9999999999.99)
+    // ra yo halnu ko karan chi for a hotel room there is room price
+     basePrice: decimal("base_price", {
+      precision: 12,
+      scale: 2,
+    }),
 
     config: jsonb("config"),
 
@@ -98,6 +112,10 @@ export const resources = pgTable(
   (table) => ({
     tenantIdx: index("resources_tenant_idx").on(
       table.tenantId,
+    ),
+
+    locationIdx: index("resources_location_idx").on(
+      table.locationId,
     ),
 
     resourceTypeIdx: index(

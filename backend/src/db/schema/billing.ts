@@ -13,6 +13,7 @@ import { tenants } from "./tenants";
 import { customers } from "./customers";
 import { products } from "./catalog";
 import { bookings } from "./bookings";
+import { locations } from "./location";
 
 export const invoiceStatusEnum = pgEnum("invoice_status", [
   "DRAFT",
@@ -39,6 +40,11 @@ export const invoices = pgTable(
       .notNull()
       .references(() => tenants.id, {
         onDelete: "cascade",
+      }),
+    locationId: uuid("location_id")
+      .notNull()
+      .references(() => locations.id, {
+        onDelete: "restrict",
       }),
 
     customerId: uuid("customer_id").references(() => customers.id, {
@@ -88,6 +94,10 @@ export const invoices = pgTable(
     ),
 
     tenantIdx: index("invoices_tenant_idx").on(table.tenantId),
+
+    // Powers "today's invoices/revenue for Location X" — the single most
+    // common report a shop with multiple branches will run.
+    locationIdx: index("invoices_location_idx").on(table.locationId),
   }),
 );
 
